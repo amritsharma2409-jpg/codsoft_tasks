@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MindEase — Your Safe Space</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- API Key Setup Screen (shown if config.js key missing) -->
+<div class="setup-screen" id="setupScreen">
+  <div class="setup-card">
+    <span class="icon">🌿</span>
+    <h2>Welcome to MindEase</h2>
+    <p>
+      No API key found in <code>js/config.js</code>.<br>
+      Add your free Gemini key there to get started.<br>
+      Get one at <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com</a>
+    </p>
+    <p class="setup-note">
+      🔒 Edit <code>js/config.js</code> directly — never paste your key here in the browser or share it anywhere public.
+    </p>
+  </div>
+</div>
+
+<!-- Main Chat UI -->
+<div class="app">
+  <header class="header">
+    <div class="avatar-wrap">
+      <div class="bot-avatar">🌿</div>
+      <div class="online-ring"></div>
+    </div>
+    <div class="header-text">
+      <h1>MindEase</h1>
+      <p>Your compassionate AI companion</p>
+    </div>
+    <span class="safe-badge">🔒 Safe Space</span>
+  </header>
+
+  <main class="messages" id="messages">
+    <div class="welcome" id="welcome">
+      <span class="welcome-icon">🌿</span>
+      <h2>You are not alone.</h2>
+      <p>This is a safe, judgment-free space.<br>Share what's on your mind — I'm here to listen and support you.</p>
+      <div class="chips">
+        <button class="chip" data-text="I have been feeling really anxious lately and I don't know why.">Feeling anxious 😰</button>
+        <button class="chip" data-text="I feel so lonely and nobody really understands me.">Feeling lonely 💙</button>
+        <button class="chip" data-text="I am overwhelmed with stress and don't know how to cope.">Too much stress 😮‍💨</button>
+        <button class="chip" data-text="I keep feeling like I am not good enough no matter what I do.">Self-doubt 🪞</button>
+        <button class="chip" data-text="I just need someone to talk to right now.">Just need to talk 🫂</button>
+      </div>
+      <div class="disclaimer">
+        ⚠️ MindEase is an AI companion, not a licensed therapist.
+        If you're in crisis, please reach out to a professional.
+      </div>
+    </div>
+  </main>
+
+  <footer class="input-area">
+    <div class="input-row">
+      <textarea
+        id="userInput"
+        placeholder="Share what's on your mind... I'm listening 🌿"
+        rows="1"></textarea>
+      <button class="send-btn" id="sendBtn" aria-label="Send message">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <div class="input-footer">
+      <span>Enter to send &nbsp;·&nbsp; Shift+Enter for new line</span>
+      <span class="dot-sep">·</span>
+      <a class="crisis-link" href="tel:9152XXXXXX">iCall: 9152XXXXXX</a>
+    </div>
+  </footer>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/chat.js"></script>
+</body>
+</html>
