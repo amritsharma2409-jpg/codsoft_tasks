@@ -7,7 +7,17 @@ A premium, single-page Tic-Tac-Toe game with an AI opponent powered by **Minimax
 ![Vanilla JS](https://img.shields.io/badge/JavaScript-Vanilla-yellow.svg)
 
 ---
+# TicTacAI — Play Against an Unbeatable Mind
 
+A premium, single-page Tic-Tac-Toe game with an AI opponent powered by **Minimax with Alpha-Beta pruning**. Three difficulty levels, persistent stats, achievements, ambient canvas backgrounds, and a full dark/light/auto theme system — built entirely with vanilla HTML, CSS, and JavaScript. No frameworks, no build step, no dependencies.
+
+🔗 **Live Demo:** https://amritsharma2409-jpg.github.io/tictacai/
+
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![No dependencies](https://img.shields.io/badge/dependencies-none-brightgreen.svg)
+![Vanilla JS](https://img.shields.io/badge/JavaScript-Vanilla-yellow.svg)
+
+---
 ## Table of Contents
 
 - [Features](#features)
