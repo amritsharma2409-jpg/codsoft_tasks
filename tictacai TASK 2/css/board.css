@@ -1,0 +1,187 @@
+/* ==========================================================================
+   BOARD — the focal point of the whole app
+   Design note: the win-pulse, ripple, and line-draw keyframes below are
+   used ONLY here, so they live in this file rather than the shared
+   animations.css library (which is reserved for keyframes reused
+   across 2+ files — modal, toast, counters, screen transitions).
+   ========================================================================== */
+
+.board-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  margin: var(--space-sm) 0;
+}
+
+/* ------------------------------------------------------------------
+   BOARD CONTAINER — large, glass, houses the winning-line overlay
+   ------------------------------------------------------------------ */
+.game-board {
+  position: relative; /* anchors .winning-line */
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: clamp(0.5rem, 2vw, 0.85rem);
+  width: 100%;
+  max-width: clamp(320px, 90vw, 460px);
+  aspect-ratio: 1 / 1;
+  padding: clamp(0.75rem, 2.5vw, 1.1rem);
+  background: var(--surface);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-xl);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: var(--shadow-soft);
+  transition: box-shadow var(--t-mid);
+}
+
+/* ------------------------------------------------------------------
+   AI THINKING — a slow ambient pulse on the whole board while
+   Minimax is "deciding" (the 3-dot loader itself lives in layout.css,
+   next to the turn indicator).
+   ------------------------------------------------------------------ */
+@keyframes boardThinking {
+  0%, 100% { box-shadow: var(--shadow-soft); }
+  50%      { box-shadow: var(--shadow-soft), 0 0 30px rgba(168, 85, 247, 0.4); }
+}
+
+.game-board.thinking {
+  pointer-events: none;
+  animation: boardThinking 1.1s ease-in-out infinite;
+}
+
+/* ------------------------------------------------------------------
+   CELLS
+   ------------------------------------------------------------------ */
+.cell {
+  position: relative;
+  overflow: hidden; /* clips the ripple */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 9vw, 3rem);
+  font-weight: 800;
+  color: var(--text-primary);
+  transition: transform var(--t-fast), background var(--t-fast),
+              border-color var(--t-fast), box-shadow var(--t-fast);
+}
+
+.cell:hover:not(.filled):not(:disabled) {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: var(--c-signal-blue);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 22px rgba(63, 208, 255, 0.22);
+}
+
+.cell:active:not(.filled):not(:disabled) {
+  transform: translateY(0) scale(0.94);
+}
+
+.cell:disabled {
+  cursor: default;
+}
+
+.cell:focus-visible {
+  outline-offset: -3px;
+  box-shadow: 0 0 0 3px rgba(63, 208, 255, 0.35);
+}
+
+/* Symbol coloring — JS adds .x / .o after a move. */
+.cell.x {
+  color: var(--c-signal-blue);
+  text-shadow: var(--glow-blue);
+}
+
+.cell.o {
+  color: var(--c-signal-purple);
+  text-shadow: var(--glow-purple);
+}
+
+/* Placement pop-in — a slight overshoot feels more "tactile" than a
+   plain fade, using the snap easing curve defined in variables.css. */
+@keyframes cellPop {
+  0%   { transform: scale(0.3); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.cell.x, .cell.o {
+  animation: cellPop 0.4s var(--ease-snap);
+}
+
+/* ------------------------------------------------------------------
+   CELL RIPPLE — a soft expanding ring from the center on every tap,
+   independent of whether the move was even legal (pure tactile
+   feedback, like Material's ripple but glow-tinted instead of grey).
+   ------------------------------------------------------------------ */
+.cell-ripple {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(63, 208, 255, 0.5), transparent 70%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes cellRipple {
+  0%   { transform: scale(0); opacity: 0.6; }
+  100% { transform: scale(9); opacity: 0; }
+}
+
+.cell.rippling .cell-ripple {
+  animation: cellRipple 0.55s var(--ease-smooth);
+}
+
+/* ------------------------------------------------------------------
+   WINNING CELLS — glowing pulse loop once a line is found
+   ------------------------------------------------------------------ */
+@keyframes winPulse {
+  0%, 100% {
+    box-shadow: 0 0 14px rgba(63, 208, 255, 0.55), 0 0 14px rgba(168, 85, 247, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 32px rgba(63, 208, 255, 0.95), 0 0 38px rgba(255, 95, 162, 0.6);
+    transform: scale(1.05);
+  }
+}
+
+.cell.winning-cell {
+  border-color: transparent;
+  background: var(--gradient-primary-hover);
+  color: var(--c-void);
+  text-shadow: none;
+  animation: winPulse 1s ease-in-out infinite;
+}
+
+/* ------------------------------------------------------------------
+   WINNING LINE — a two-layer glowing bar drawn across the 3 winning
+   cells: a wide blurred glow behind a thin bright core, positioned
+   and rotated by board.js using basic trigonometry.
+   ------------------------------------------------------------------ */
+.winning-line {
+  position: absolute;
+  height: 6px;
+  border-radius: 999px;
+  transform-origin: left center;
+  transform: scaleX(0);
+  opacity: 0;
+  pointer-events: none;
+  background: var(--gradient-signature);
+  box-shadow:
+    0 0 8px rgba(63, 208, 255, 0.9),
+    0 0 24px rgba(168, 85, 247, 0.7),
+    0 0 40px rgba(255, 95, 162, 0.4);
+  transition: transform 0.5s var(--ease-smooth), opacity 0.25s ease;
+}
+
+.winning-line.show {
+  opacity: 1;
+}

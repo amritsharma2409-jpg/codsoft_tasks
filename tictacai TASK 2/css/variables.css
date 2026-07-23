@@ -1,0 +1,116 @@
+/* ==========================================================================
+   VARIABLES — Design Token System
+   Every color, font, spacing, glow, and timing value used anywhere in
+   the app is defined here ONCE. Change a value here, it updates
+   everywhere — no magic numbers scattered across other files.
+   ========================================================================== */
+
+:root {
+  /* ------------------------------------------------------------------
+     COLOR — 6 named tokens. Everything else derives from these.
+     ------------------------------------------------------------------ */
+  --c-void: #06070f;        /* primary background */
+  --c-void-deep: #0b0d1c;   /* secondary background (gradients) */
+  --c-signal-blue: #3fd0ff; /* Human / ✕ */
+  --c-signal-purple: #a855f7; /* AI / ○ */
+  --c-signal-pink: #ff5fa2; /* achievements, streaks, share */
+  --c-foam: #eef1fb;        /* light-mode surface / dark-mode primary text */
+
+  /* Softer variants, derived for hover/glow states */
+  --c-blue-soft: #7fe3ff;
+  --c-purple-soft: #c084fc;
+
+  /* ------------------------------------------------------------------
+     SURFACE — glass panels, borders, text (dark mode = default)
+     ------------------------------------------------------------------ */
+  --bg: var(--c-void);
+  --bg-deep: var(--c-void-deep);
+  --surface: rgba(255, 255, 255, 0.06);
+  --surface-strong: rgba(255, 255, 255, 0.1);
+  --border-glass: rgba(255, 255, 255, 0.14);
+
+  --text-primary: var(--c-foam);
+  --text-muted: #98a0b8;
+  --text-faint: #5b6178;
+
+  /* ------------------------------------------------------------------
+     GRADIENTS
+     ------------------------------------------------------------------ */
+  --gradient-primary: linear-gradient(135deg, var(--c-signal-blue) 0%, var(--c-signal-purple) 100%);
+  --gradient-primary-hover: linear-gradient(135deg, var(--c-blue-soft) 0%, var(--c-purple-soft) 100%);
+  --gradient-text: linear-gradient(135deg, var(--c-signal-blue) 0%, var(--c-signal-purple) 60%, var(--c-signal-pink) 100%);
+  --gradient-signature: linear-gradient(135deg, var(--c-signal-blue) 0%, var(--c-signal-purple) 50%, var(--c-signal-pink) 100%);
+
+  /* ------------------------------------------------------------------
+     GLOW / SHADOW
+     ------------------------------------------------------------------ */
+  --glow-blue: 0 0 24px rgba(63, 208, 255, 0.45);
+  --glow-purple: 0 0 24px rgba(168, 85, 247, 0.45);
+  --glow-pink: 0 0 24px rgba(255, 95, 162, 0.45);
+  --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.45);
+  --shadow-lift: 0 16px 48px rgba(0, 0, 0, 0.55);
+
+  /* ------------------------------------------------------------------
+     TYPOGRAPHY — 3 roles, each with a specific job
+     ------------------------------------------------------------------ */
+  --font-display: 'Cabinet Grotesk', 'Space Grotesk', sans-serif; /* logo, hero, modal titles */
+  --font-ui: 'Clash Grotesk', 'Space Grotesk', sans-serif;         /* buttons, labels, stat values */
+  --font-body: 'Space Grotesk', sans-serif;                        /* paragraphs, AI messages */
+
+  /* ------------------------------------------------------------------
+     SPACING SCALE — used instead of ad-hoc rem values
+     ------------------------------------------------------------------ */
+  --space-xs: 0.375rem;
+  --space-sm: 0.75rem;
+  --space-md: 1.25rem;
+  --space-lg: 2rem;
+  --space-xl: 3.25rem;
+
+  /* ------------------------------------------------------------------
+     RADIUS
+     ------------------------------------------------------------------ */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+
+  /* ------------------------------------------------------------------
+     MOTION — one easing curve, used everywhere for consistency
+     ------------------------------------------------------------------ */
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-snap: cubic-bezier(0.34, 1.56, 0.64, 1); /* slight overshoot, for playful pops */
+  --t-fast: 0.2s var(--ease-smooth);
+  --t-mid: 0.4s var(--ease-smooth);
+  --t-slow: 0.7s var(--ease-smooth);
+
+  /* ------------------------------------------------------------------
+     Z-INDEX SCALE — centralized so layering is never guessed twice
+     ------------------------------------------------------------------ */
+  --z-bg: -1;
+  --z-base: 1;
+  --z-top-bar: 100;
+  --z-fx: 500;
+  --z-toast: 800;
+  --z-modal: 1000;
+  --z-loader: 2000;
+}
+
+/* ==========================================================================
+   LIGHT MODE — toggled by JS adding `.light-mode` to <body>
+   (Also used for the "Auto" theme option: JS detects the system's
+   prefers-color-scheme and applies this same class, see theme.js.)
+   ========================================================================== */
+body.light-mode {
+  --bg: #eef1fb;
+  --bg-deep: #dfe4f7;
+  --surface: rgba(255, 255, 255, 0.55);
+  --surface-strong: rgba(255, 255, 255, 0.75);
+  --border-glass: rgba(20, 24, 48, 0.1);
+
+  --text-primary: #12162b;
+  --text-muted: #4b5170;
+  --text-faint: #838aa8;
+
+  --shadow-soft: 0 8px 32px rgba(80, 90, 150, 0.15);
+  --shadow-lift: 0 16px 40px rgba(80, 90, 150, 0.22);
+}

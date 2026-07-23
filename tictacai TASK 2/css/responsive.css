@@ -1,0 +1,183 @@
+/* ==========================================================================
+   RESPONSIVE — Breakpoints
+   Most sizing already flexes via clamp()/fr units in the component
+   files. This file handles the layout SHAPE changes that clamp()
+   can't express — column counts, repositioning, stacking order.
+   Mobile-first base styles already assume the smallest screens; the
+   rules below are overrides as viewports grow, plus a couple of
+   small-screen-specific tightenings at the top.
+   ========================================================================== */
+
+/* ------------------------------------------------------------------
+   VERY SMALL PHONES (< 360px)
+   ------------------------------------------------------------------ */
+@media (max-width: 359px) {
+  .home-eyebrow {
+    font-size: 0.62rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .play-btn {
+    padding: 0.9rem 1.9rem;
+    font-size: 0.92rem;
+  }
+
+  .stat-value {
+    font-size: 0.9rem;
+  }
+
+  .loader-text {
+    font-size: 0.85rem;
+  }
+}
+
+/* ------------------------------------------------------------------
+   PHONES (<= 480px)
+   ------------------------------------------------------------------ */
+@media (max-width: 480px) {
+  .top-bar {
+    padding: var(--space-sm) var(--space-sm);
+  }
+
+  .top-bar-brand {
+    font-size: 0.85rem;
+  }
+
+  .home-stats-teaser {
+    gap: var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .difficulty-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .difficulty-buttons {
+    justify-content: space-between;
+  }
+
+  .difficulty-btn {
+    flex: 1;
+    text-align: center;
+  }
+
+  /* 4 stat columns get cramped on narrow phones — drop to 2x2. */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: var(--space-sm);
+  }
+
+  .modal {
+    padding: 2rem 1.35rem 1.5rem;
+  }
+
+  .modal-title {
+    font-size: 1.25rem;
+  }
+
+  .modal-stats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.35rem;
+  }
+
+  /* A corner toast is easy to miss/hard to reach on a phone —
+     switch to a full-width banner docked under the top bar instead. */
+  .achievement-toast {
+    left: var(--space-sm);
+    right: var(--space-sm);
+    top: calc(64px + var(--space-sm));
+    max-width: none;
+    transform: translateY(-140%);
+  }
+
+  .achievement-toast.show {
+    transform: translateY(0);
+  }
+}
+
+/* ------------------------------------------------------------------
+   SMALL TABLETS (481px – 640px)
+   ------------------------------------------------------------------ */
+@media (min-width: 481px) and (max-width: 640px) {
+  .stats-grid {
+    gap: 0.5rem;
+  }
+}
+
+/* ------------------------------------------------------------------
+   LANDSCAPE PHONES — short viewport height, board must not push the
+   restart button off-screen.
+   ------------------------------------------------------------------ */
+@media (max-height: 600px) and (orientation: landscape) {
+  .game-board {
+    max-width: 280px;
+  }
+
+  .game-screen {
+    padding-top: calc(56px + var(--space-sm));
+    gap: var(--space-sm);
+  }
+
+  .home-screen {
+    padding-top: calc(56px + var(--space-md));
+  }
+
+  .home-logo-line {
+    font-size: clamp(2rem, 8vw, 3rem);
+  }
+}
+
+/* ------------------------------------------------------------------
+   TABLETS & UP (>= 768px) — a little more breathing room
+   ------------------------------------------------------------------ */
+@media (min-width: 768px) {
+  .game-screen > * {
+    max-width: 520px;
+  }
+
+  .modal {
+    max-width: 440px;
+  }
+}
+
+/* ------------------------------------------------------------------
+   DESKTOP & LAPTOP (>= 1024px)
+   The layout stays a centered single column by design (this is a
+   focused game screen, not a dashboard) — but on large monitors it
+   gets a bit more scale and breathing room so it doesn't read as a
+   stretched mobile view.
+   ------------------------------------------------------------------ */
+@media (min-width: 1024px) {
+  .home-tagline {
+    font-size: 1.15rem;
+  }
+
+  .game-screen > * {
+    max-width: 560px;
+  }
+
+  .game-board {
+    max-width: 480px;
+  }
+
+  .turn-panel,
+  .scoreboard,
+  .stats-panel {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+/* ------------------------------------------------------------------
+   LARGE DESKTOP (>= 1440px) — cap growth so text lines don't sprawl
+   ------------------------------------------------------------------ */
+@media (min-width: 1440px) {
+  .home-content {
+    max-width: 620px;
+  }
+
+  .app-footer {
+    font-size: 0.85rem;
+  }
+}

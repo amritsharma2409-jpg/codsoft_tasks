@@ -1,0 +1,253 @@
+/* ==========================================================================
+   POPUPS — Result modal (Win / Draw) + Achievement toast
+   Two separate components on purpose: they can be visible at the same
+   time (e.g. "You Win!" + "🏆 First Win" unlocked) without fighting
+   for the same screen real estate.
+   ========================================================================== */
+
+/* ==========================================================================
+   RESULT MODAL
+   ========================================================================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+  background: rgba(3, 4, 10, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--t-mid), visibility var(--t-mid);
+}
+
+/* The native `hidden` attribute always wins while present — JS removes
+   it right before adding `.open`, and re-adds it after the closing
+   transition finishes (see modal.js). */
+.modal-overlay[hidden] {
+  display: none;
+}
+
+.modal-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 2.5rem 1.75rem 1.75rem;
+  text-align: center;
+  border-radius: var(--radius-xl);
+  transform: scale(0.85) translateY(24px);
+  opacity: 0;
+  transition: transform var(--t-mid), opacity var(--t-mid);
+}
+
+.modal-overlay.open .modal {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+
+.modal-close {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  width: 34px;
+  height: 34px;
+}
+
+.modal-close:hover {
+  transform: rotate(90deg);
+}
+
+/* Icon sits on a soft colored halo — modal.js adds a `.result-*`
+   modifier so the glow color matches the outcome. */
+.modal-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 76px;
+  height: 76px;
+  margin-bottom: var(--space-sm);
+  font-size: 2.75rem;
+  line-height: 1;
+}
+
+.modal-icon::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  filter: blur(20px);
+  opacity: 0.5;
+  z-index: -1;
+}
+
+.modal-icon.result-win::before  { background: var(--c-signal-blue); }
+.modal-icon.result-lose::before { background: var(--c-signal-purple); }
+.modal-icon.result-draw::before { background: var(--text-faint); }
+
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 0.4rem;
+}
+
+.modal-subtitle {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+}
+
+.modal-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  padding: 0.9rem 0.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-glass);
+}
+
+.modal-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.modal-stat-label {
+  font-family: var(--font-ui);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+}
+
+.modal-stat-value {
+  font-family: var(--font-ui);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.modal-play-again {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Secondary action — visually distinct (outline, not filled) so
+   "Play Again" always reads as the primary choice. */
+.share-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.8rem 2rem;
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--c-signal-pink);
+  background: transparent;
+  border: 1.5px solid var(--c-signal-pink);
+  border-radius: 999px;
+  transition: all var(--t-fast);
+}
+
+.share-btn .icon {
+  width: 17px;
+  height: 17px;
+}
+
+.share-btn:hover {
+  background: rgba(255, 95, 162, 0.1);
+  box-shadow: var(--glow-pink);
+  transform: translateY(-2px);
+}
+
+.share-btn:active {
+  transform: translateY(0) scale(0.97);
+}
+
+/* ==========================================================================
+   ACHIEVEMENT TOAST
+   ========================================================================== */
+.achievement-toast {
+  position: fixed;
+  top: calc(70px + var(--space-sm));
+  right: var(--space-md);
+  z-index: var(--z-toast);
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.9rem 1.2rem;
+  max-width: 300px;
+  border-radius: var(--radius-md);
+  background: var(--surface-strong);
+  border: 1px solid var(--border-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: var(--shadow-lift), var(--glow-pink);
+  transform: translateX(120%);
+  transition: transform var(--t-mid);
+}
+
+.achievement-toast.show {
+  transform: translateX(0);
+}
+
+.achievement-icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  border-radius: 50%;
+  background: var(--gradient-signature);
+}
+
+.achievement-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  text-align: left;
+}
+
+.achievement-eyebrow {
+  font-family: var(--font-ui);
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--c-signal-pink);
+}
+
+.achievement-title {
+  font-family: var(--font-ui);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}

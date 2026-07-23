@@ -1,0 +1,177 @@
+/* ==========================================================================
+   HOME — Landing screen
+   The "wow, I want to play this" first moment. Everything here is
+   centered, generous on whitespace, and built around the two-line
+   stacked logo as the signature visual.
+   ========================================================================== */
+
+.home-screen {
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--space-xl) + 60px) var(--space-md) var(--space-xl);
+  text-align: center;
+}
+
+.home-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  max-width: 560px;
+}
+
+/* ------------------------------------------------------------------
+   EYEBROW — small pill line above the logo
+   ------------------------------------------------------------------ */
+.home-eyebrow {
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border-glass);
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+/* ------------------------------------------------------------------
+   SIGNATURE LOGO — two stacked lines, second line offset for a
+   dynamic, editorial feel instead of a plain centered lockup.
+   (The assembling entrance animation lives in animations.css.)
+   ------------------------------------------------------------------ */
+.home-logo {
+  display: flex;
+  flex-direction: column;
+  line-height: 0.95;
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+
+.home-logo-line {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  font-size: clamp(2.75rem, 11vw, 5rem);
+}
+
+.home-logo-line-2 {
+  align-self: flex-end;
+  margin-top: 0.05em;
+}
+
+.home-title-text {
+  color: var(--text-primary);
+}
+
+.home-symbol {
+  font-family: var(--font-display);
+  line-height: 1;
+  font-size: 0.85em;
+}
+
+.home-symbol-x {
+  color: var(--c-signal-blue);
+  text-shadow: var(--glow-blue);
+  transform: rotate(-6deg);
+}
+
+.home-symbol-o {
+  color: var(--c-signal-purple);
+  text-shadow: var(--glow-purple);
+  transform: rotate(6deg);
+}
+
+/* ------------------------------------------------------------------
+   TAGLINE
+   ------------------------------------------------------------------ */
+.home-tagline {
+  font-family: var(--font-body);
+  font-size: clamp(0.95rem, 2.2vw, 1.1rem);
+  line-height: 1.6;
+  color: var(--text-muted);
+  max-width: 42ch;
+}
+
+/* ------------------------------------------------------------------
+   PLAY BUTTON — the hero CTA. Oversized, glowing halo pulses behind
+   it independently of hover, so it reads as "alive" at rest.
+   ------------------------------------------------------------------ */
+.play-btn {
+  position: relative;
+  margin-top: var(--space-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1.05rem 2.5rem;
+  font-family: var(--font-ui);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--c-void);
+  background: var(--gradient-primary);
+  border-radius: 999px;
+  overflow: visible;
+  box-shadow: 0 10px 30px rgba(168, 85, 247, 0.35);
+  transition: transform var(--t-fast), box-shadow var(--t-fast);
+}
+
+.play-btn .icon {
+  width: 20px;
+  height: 20px;
+}
+
+.play-btn-glow {
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  background: var(--gradient-primary);
+  filter: blur(18px);
+  opacity: 0.6;
+  z-index: -1;
+}
+
+.play-btn:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 14px 40px rgba(63, 208, 255, 0.5);
+}
+
+.play-btn:active {
+  transform: translateY(0) scale(0.97);
+}
+
+/* ------------------------------------------------------------------
+   STATS TEASER — only shown once localStorage has data (see ui.js)
+   ------------------------------------------------------------------ */
+.home-stats-teaser {
+  display: flex;
+  gap: var(--space-lg);
+  margin-top: var(--space-md);
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--border-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.home-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.home-stat-value {
+  font-family: var(--font-ui);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.home-stat-label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+}

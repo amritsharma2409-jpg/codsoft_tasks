@@ -1,0 +1,109 @@
+/* ==========================================================================
+   ANIMATIONS — Shared keyframe library
+   Reserved for keyframes/behaviors reused across 2+ files. Anything
+   used by only one component lives next to that component instead
+   (e.g. winPulse in board.css, dotBounce in layout.css).
+
+   This file targets selectors already defined elsewhere (.play-btn,
+   .restart-btn, .modal-icon, etc.) and layers animation behavior onto
+   them — it does not redefine their structural styles. Load order in
+   index.html puts this file last, so these rules apply on top.
+   ========================================================================== */
+
+/* ==========================================================================
+   1. SCREEN ENTRANCE — the "screen transition" system
+   No JS-managed animation classes needed: every screen's direct
+   children fade+rise in with a staggered delay. Because `[hidden]`
+   uses `display: none`, browsers automatically restart CSS animations
+   the moment an element becomes displayable again — so this replays
+   correctly every time home.js toggles the `hidden` attribute, with
+   zero animation bookkeeping in JS.
+   ========================================================================== */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.home-content > *,
+.game-screen > * {
+  animation: fadeSlideUp 0.7s var(--ease-smooth) both;
+}
+
+.home-content > *:nth-child(1) { animation-delay: 0.05s; }
+.home-content > *:nth-child(2) { animation-delay: 0.16s; }
+.home-content > *:nth-child(3) { animation-delay: 0.28s; }
+.home-content > *:nth-child(4) { animation-delay: 0.4s; }
+.home-content > *:nth-child(5) { animation-delay: 0.5s; }
+
+.game-screen > *:nth-child(1) { animation-delay: 0.04s; }
+.game-screen > *:nth-child(2) { animation-delay: 0.1s; }
+.game-screen > *:nth-child(3) { animation-delay: 0.16s; }
+.game-screen > *:nth-child(4) { animation-delay: 0.22s; }
+.game-screen > *:nth-child(5) { animation-delay: 0.28s; }
+.game-screen > *:nth-child(6) { animation-delay: 0.34s; }
+
+/* ==========================================================================
+   2. AMBIENT GLOW PULSE — reused by the Play button's halo (home.css)
+   AND the result modal's icon halo (popups.css). One keyframe, two
+   completely different components, same "breathing" feel.
+   ========================================================================== */
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.45; transform: scale(1); }
+  50%      { opacity: 0.8;  transform: scale(1.1); }
+}
+
+.play-btn-glow,
+.modal-icon::before {
+  animation: pulseGlow 2.6s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   3. BUTTON SHIMMER — a light sweep on hover, shared by every pill
+   button EXCEPT .play-btn (which already has its own halo-pulse
+   identity as the hero CTA — giving it a second effect would compete
+   with the glow instead of complementing it).
+
+   Covers: .restart-btn (also inherited by .modal-play-again, which
+   reuses the .restart-btn class) and .share-btn.
+   ========================================================================== */
+@keyframes buttonShimmer {
+  from { transform: translateX(-130%); }
+  to   { transform: translateX(130%); }
+}
+
+.restart-btn,
+.share-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.restart-btn::before,
+.share-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  transform: translateX(-130%);
+  pointer-events: none;
+}
+
+.restart-btn:hover::before,
+.share-btn:hover::before {
+  animation: buttonShimmer 0.65s var(--ease-smooth);
+}
+
+/* ==========================================================================
+   4. COUNTER TICK — a tiny scale-pop shared by every number that
+   changes in place: scoreboard values, stat values, and the modal's
+   stat recap. ui.js and modal.js both add/remove `.tick` the same way.
+   ========================================================================== */
+@keyframes counterTick {
+  0%   { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+
+.score-value.tick,
+.stat-value.tick,
+.modal-stat-value.tick {
+  animation: counterTick 0.35s var(--ease-snap);
+}

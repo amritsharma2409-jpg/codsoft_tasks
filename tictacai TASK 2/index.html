@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TicTacAI — Play Against an Unbeatable Mind</title>
+  <meta name="description" content="A premium Tic-Tac-Toe experience. Play against an AI powered by Minimax with Alpha-Beta pruning — three difficulties, achievements, streaks, and a mind that never misses a winning line." />
+  <meta name="theme-color" content="#06070f" />
+
+  <!-- Inline SVG favicon — keeps the project asset-free -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%2306070f'/%3E%3Ctext x='27' y='62' font-family='Arial' font-weight='900' font-size='46' fill='%233fd0ff'%3E%E2%9C%95%3C/text%3E%3Ctext x='55' y='80' font-family='Arial' font-weight='900' font-size='30' fill='%23a855f7'%3E%E2%97%8B%3C/text%3E%3C/svg%3E" />
+
+  <!-- Google Fonts — Space Grotesk (body/UI text) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Fontshare — Cabinet Grotesk (display/logo) + Clash Grotesk (labels/buttons).
+       These two are Fontshare-exclusive and are NOT available on Google Fonts. -->
+  <link rel="preconnect" href="https://api.fontshare.com">
+  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,700&f[]=clash-grotesk@600,500&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets — loaded in dependency order -->
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/background.css" />
+  <link rel="stylesheet" href="css/home.css" />
+  <link rel="stylesheet" href="css/board.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/popups.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+</head>
+<body>
+
+  <!-- ===================== LOADER ===================== -->
+  <div id="loader" class="loader" role="status" aria-label="Loading TicTacAI">
+    <div class="loader-mark" aria-hidden="true">
+      <span class="loader-x">✕</span>
+      <span class="loader-o">○</span>
+    </div>
+    <p class="loader-text">Calibrating the AI<span class="loader-dots" aria-hidden="true"><span></span><span></span><span></span></span></p>
+  </div>
+
+  <!-- ===================== AMBIENT BACKGROUND ===================== -->
+  <!-- Single canvas: drifting blobs + tiny depth particles, one shared render loop (see particles.js) -->
+  <canvas id="bgCanvas" class="bg-canvas" aria-hidden="true"></canvas>
+
+  <!-- Confetti / firework burst overlay — sits above everything, ignores clicks -->
+  <canvas id="fxCanvas" class="fx-canvas" aria-hidden="true"></canvas>
+
+  <!-- Subtle grain texture (see background.css) -->
+  <div class="bg-grain" aria-hidden="true"></div>
+
+  <!-- ===================== PERSISTENT TOP BAR ===================== -->
+  <!-- Stays visible across both screens: brand mark (small) + theme control -->
+  <div class="top-bar">
+    <button id="backBtn" class="icon-btn back-btn" aria-label="Back to home screen" title="Back to home" hidden>
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+    </button>
+
+    <div class="top-bar-brand" aria-hidden="true">
+      <span class="brand-mark">Tic<span class="accent">Tac</span>AI</span>
+    </div>
+
+    <button id="themeToggle" class="icon-btn theme-toggle" aria-label="Switch theme" title="Switch theme">
+      <svg class="icon icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="4"></circle>
+        <line x1="12" y1="2" x2="12" y2="4"></line>
+        <line x1="12" y1="20" x2="12" y2="22"></line>
+        <line x1="4.93" y1="4.93" x2="6.34" y2="6.34"></line>
+        <line x1="17.66" y1="17.66" x2="19.07" y2="19.07"></line>
+        <line x1="2" y1="12" x2="4" y2="12"></line>
+        <line x1="20" y1="12" x2="22" y2="12"></line>
+        <line x1="4.93" y1="19.07" x2="6.34" y2="17.66"></line>
+        <line x1="17.66" y1="6.34" x2="19.07" y2="4.93"></line>
+      </svg>
+      <svg class="icon icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+      <svg class="icon icon-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="9"></circle>
+        <path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"></path>
+      </svg>
+    </button>
+  </div>
+
+  <!-- ===================== MAIN APP ===================== -->
+  <main id="app" class="app">
+
+    <!-- ============================================================
+         HOME SCREEN — the "wow, I want to play this" first moment
+         ============================================================ -->
+    <section id="homeScreen" class="screen home-screen" aria-label="Home">
+
+      <div class="home-content">
+        <p class="home-eyebrow">Minimax · Alpha-Beta Pruning · Zero Losses</p>
+
+        <h1 class="home-logo">
+          <span class="home-logo-line">
+            <span class="home-symbol home-symbol-x">✕</span>
+            <span class="home-title-text">Tic<span class="accent">Tac</span></span>
+          </span>
+          <span class="home-logo-line home-logo-line-2">
+            <span class="home-title-text">AI</span>
+            <span class="home-symbol home-symbol-o">○</span>
+          </span>
+        </h1>
+
+        <p class="home-tagline">
+          An opponent that has never lost. Play against a mind that
+          calculates every possible ending before you've finished your move.
+        </p>
+
+        <button id="playBtn" class="play-btn">
+          <span class="play-btn-glow" aria-hidden="true"></span>
+          <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <polygon points="6 3 20 12 6 21 6 3"></polygon>
+          </svg>
+          <span>Play Now</span>
+        </button>
+
+        <!-- Quick stats teaser — populated from localStorage via ui.js, hidden until a game has been played -->
+        <div id="homeStatsTeaser" class="home-stats-teaser" hidden>
+          <div class="home-stat">
+            <span id="teaserGamesPlayed" class="home-stat-value">0</span>
+            <span class="home-stat-label">Games Played</span>
+          </div>
+          <div class="home-stat">
+            <span id="teaserBestStreak" class="home-stat-value">0</span>
+            <span class="home-stat-label">Best Streak</span>
+          </div>
+          <div class="home-stat">
+            <span id="teaserAchievements" class="home-stat-value">0/4</span>
+            <span class="home-stat-label">Achievements</span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ============================================================
+         GAME SCREEN — hidden until Play is pressed
+         ============================================================ -->
+    <section id="gameScreen" class="screen game-screen" aria-label="Game" hidden>
+
+      <!-- ---------- Difficulty Selector ---------- -->
+      <div class="difficulty-row">
+        <span class="panel-label">Difficulty</span>
+        <div class="difficulty-buttons" role="group" aria-label="Select AI difficulty">
+          <button class="difficulty-btn" data-difficulty="easy" aria-pressed="false">Easy</button>
+          <button class="difficulty-btn active" data-difficulty="medium" aria-pressed="true">Medium</button>
+          <button class="difficulty-btn" data-difficulty="impossible" aria-pressed="false">Impossible</button>
+        </div>
+      </div>
+
+      <!-- ---------- Turn Indicator + AI Message ---------- -->
+      <div class="turn-panel glass-panel">
+        <div id="turnDisplay" class="turn-display" aria-live="polite" aria-atomic="true">
+          <span class="turn-symbol player-symbol">✕</span>
+          <span class="turn-text">Your Turn</span>
+          <span id="thinkingDots" class="thinking-dots" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </span>
+        </div>
+        <p id="aiMessage" class="ai-message" aria-live="polite">Good luck. You'll need it. 😏</p>
+      </div>
+
+      <!-- ---------- Scoreboard ---------- -->
+      <section class="scoreboard glass-panel" aria-label="Scoreboard">
+        <div class="score-item score-player">
+          <span class="score-label">You</span>
+          <span id="scorePlayer" class="score-value" data-count="0">0</span>
+        </div>
+        <div class="score-item score-draws">
+          <span class="score-label">Draws</span>
+          <span id="scoreDraws" class="score-value" data-count="0">0</span>
+        </div>
+        <div class="score-item score-ai">
+          <span class="score-label">AI</span>
+          <span id="scoreAI" class="score-value" data-count="0">0</span>
+        </div>
+      </section>
+
+      <!-- ---------- Extended Stats ---------- -->
+      <section class="stats-panel glass-panel" aria-label="Game statistics">
+        <div class="stats-header">
+          <span class="panel-label">Statistics</span>
+          <button id="resetScoresBtn" class="icon-btn" aria-label="Reset all scores and statistics" title="Reset scores">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              <line x1="10" y1="11" x2="10" y2="17"></line>
+              <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-label">Current Streak</span>
+            <span id="statCurrentStreak" class="stat-value" data-count="0">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Best Streak</span>
+            <span id="statBestStreak" class="stat-value" data-count="0">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Games Played</span>
+            <span id="statGamesPlayed" class="stat-value" data-count="0">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Move</span>
+            <span id="statMoveCount" class="stat-value">0 / 9</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- Game Board ---------- -->
+      <section class="board-section" aria-label="Game board">
+        <div id="gameBoard" class="game-board">
+          <button class="cell" data-index="0" aria-label="Cell 1"><span class="cell-ripple" aria-hidden="true"></span></button>
+          <button class="cell" data-index="1" aria-label="Cell 2"><span class="cell-ripple" aria-hidden="true"></span></button>
+          <button class="cell" data-index="2" aria-label="Cell 3"><span class="cell-ripple" aria-hidden="true"></span></button>
+          <button class="cell" data-index="3" aria-label="Cell 4"><span class="cell-ripple" aria-hidden="true"></span></button>
+          <button class="cell" data-index="4" aria-label="Cell 5"><span class="cell-ripple" aria-hidden="true"></span></button>
+          <button class="cell" data-index="5" aria-label="Cell 6"><span class="cell-ripple" aria-hidden="true"></span></button>
+          <button class="cell" data-index="6" aria-label="Cell 7"><span class="cell-ripple" aria-hidden="true"></span></button>
+          <button class="cell" data-index="7" aria-label="Cell 8"><span class="cell-ripple" aria-hidden="true"></span></button>
+          <button class="cell" data-index="8" aria-label="Cell 9"><span class="cell-ripple" aria-hidden="true"></span></button>
+
+          <!-- Animated line drawn through the 3 winning cells -->
+          <div id="winningLine" class="winning-line" aria-hidden="true"></div>
+        </div>
+
+        <p id="statusMessage" class="status-message" aria-live="polite"></p>
+      </section>
+
+      <!-- ---------- Restart ---------- -->
+      <div class="actions">
+        <button id="restartBtn" class="restart-btn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+          Restart Game
+        </button>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="app-footer">
+    <p>Built with HTML, CSS &amp; Vanilla JavaScript &mdash; AI powered by <strong>Minimax + Alpha-Beta Pruning</strong></p>
+  </footer>
+
+  <!-- ===================== RESULT MODAL (Win / Draw popup) ===================== -->
+  <div id="resultModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle" hidden>
+    <div class="modal glass-panel">
+      <button id="modalCloseBtn" class="modal-close icon-btn" aria-label="Close popup">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <div id="modalIcon" class="modal-icon" aria-hidden="true"></div>
+      <h2 id="modalTitle" class="modal-title">Result</h2>
+      <p id="modalSubtitle" class="modal-subtitle">Details go here</p>
+
+      <div class="modal-stats">
+        <div class="modal-stat">
+          <span class="modal-stat-label">Moves</span>
+          <span id="modalMoves" class="modal-stat-value">0</span>
+        </div>
+        <div class="modal-stat">
+          <span class="modal-stat-label">Streak</span>
+          <span id="modalStreak" class="modal-stat-value">0</span>
+        </div>
+        <div class="modal-stat">
+          <span class="modal-stat-label">Win Rate</span>
+          <span id="modalWinRate" class="modal-stat-value">0%</span>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="modalPlayAgainBtn" class="restart-btn modal-play-again">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+          Play Again
+        </button>
+        <button id="modalShareBtn" class="share-btn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+          </svg>
+          Share Score
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== ACHIEVEMENT TOAST ===================== -->
+  <!-- Separate from the result modal — appears briefly top-corner, auto-dismisses -->
+  <div id="achievementToast" class="achievement-toast" role="status" aria-live="polite" hidden>
+    <span id="achievementIcon" class="achievement-icon" aria-hidden="true">🏆</span>
+    <div class="achievement-text">
+      <span class="achievement-eyebrow">Achievement Unlocked</span>
+      <span id="achievementTitle" class="achievement-title">First Win</span>
+    </div>
+  </div>
+
+  <!-- ===================== SCRIPTS ===================== -->
+  <script type="module" src="js/main.js"></script>
+
+</body>
+</html>

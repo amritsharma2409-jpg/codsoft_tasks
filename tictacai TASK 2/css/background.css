@@ -1,0 +1,101 @@
+/* ==========================================================================
+   BACKGROUND — Ambient depth system
+   Three layers, back to front:
+     1. Static gradient wash (cheap, always there, zero JS dependency)
+     2. #bgCanvas — drifting blobs + tiny particles (drawn by particles.js)
+     3. Grain texture + vignette — the "premium" finish that keeps the
+        glow from looking flat or purely digital
+   ========================================================================== */
+
+/* ------------------------------------------------------------------
+   1. BASE GRADIENT WASH
+   A cheap two-tone radial gradient sits directly on <body>, so there's
+   depth even before particles.js finishes booting (or if a user has
+   JS-heavy animations throttled by their browser).
+   ------------------------------------------------------------------ */
+body {
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(63, 208, 255, 0.10), transparent 60%),
+    radial-gradient(ellipse 70% 60% at 85% 100%, rgba(168, 85, 247, 0.10), transparent 60%),
+    var(--bg);
+}
+
+body.light-mode {
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(63, 208, 255, 0.14), transparent 60%),
+    radial-gradient(ellipse 70% 60% at 85% 100%, rgba(168, 85, 247, 0.12), transparent 60%),
+    var(--bg);
+}
+
+/* ------------------------------------------------------------------
+   2. CANVAS LAYERS
+   ------------------------------------------------------------------ */
+.bg-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: var(--z-bg);
+  pointer-events: none;
+  /* `screen` blend makes overlapping glow colors brighten each other
+     instead of muddying into brown/grey — key to the "neon" look. */
+  mix-blend-mode: screen;
+  opacity: 0.9;
+}
+
+body.light-mode .bg-canvas {
+  /* `screen` washes out on a light background; `multiply` keeps the
+     same drifting shapes readable as soft tinted glass instead. */
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+}
+
+.fx-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: var(--z-fx);
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------
+   3. GRAIN TEXTURE
+   A single inline SVG fractal-noise pattern, tiled and kept at very
+   low opacity. Breaks up the smooth gradient/blur banding that flat
+   digital glows otherwise show on large screens — the difference
+   between "looks like a game" and "looks like a CSS demo."
+   ------------------------------------------------------------------ */
+.bg-grain {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-bg);
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+body.light-mode .bg-grain {
+  opacity: 0.025;
+}
+
+/* ------------------------------------------------------------------
+   4. VIGNETTE
+   Subtly darkens the corners so the center (board, modal, hero) reads
+   as the focal point without needing any extra markup. Lives on
+   body::after rather than the canvas, since <canvas> elements can't
+   render CSS pseudo-content.
+   ------------------------------------------------------------------ */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-bg);
+  pointer-events: none;
+  background: radial-gradient(ellipse 90% 80% at 50% 45%, transparent 55%, rgba(0, 0, 0, 0.35) 100%);
+}
+
+body.light-mode::after {
+  background: radial-gradient(ellipse 90% 80% at 50% 45%, transparent 55%, rgba(20, 24, 48, 0.08) 100%);
+}

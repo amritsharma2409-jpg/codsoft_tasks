@@ -1,0 +1,37 @@
+services:
+  - type: web
+    name: visioncaption-ai-backend
+    runtime: docker
+    dockerfilePath: ./Backend/Dockerfile
+    dockerContext: ./Backend
+    plan: free
+    region: oregon
+    healthCheckPath: /api/v1/health
+    autoDeploy: true
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DEBUG
+        value: false
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: 8000
+      - key: SECRET_KEY
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: '["https://visioncaption.ai","https://www.visioncaption.ai","http://localhost:3000"]'
+      - key: DATABASE_URL
+        value: sqlite+aiosqlite:///./visioncaption.db
+      - key: MODEL_NAME
+        value: Salesforce/blip-image-captioning-base
+      - key: MODEL_CACHE_DIR
+        value: /app/model_cache
+      - key: MODEL_DEVICE
+        value: cpu
+      - key: ENABLE_OCR
+        value: false
+      - key: ENABLE_OBJECT_DETECTION
+        value: false
+      - key: LOG_LEVEL
+        value: INFO
